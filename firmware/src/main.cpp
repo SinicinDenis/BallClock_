@@ -5,8 +5,8 @@
 #include <WiFiConnector.h>
 #include <Wire.h>
 #include <iarduino_RTC.h>
-
-iarduino_RTC time_rtc(RTC_DS1302, 25, 27, 26);
+#include <iarduino_I2C_Software.h>	
+iarduino_RTC time_rtc(RTC_DS1302, 19, 22, 21);
 #include "config.h"
 #include "matrix.h"
 #include "settings.h"
@@ -34,9 +34,9 @@ void setup() {
     Serial.println("\n" PROJECT_NAME " v" PROJECT_VER);
 
     matrix.begin();
-    
-    
     time_rtc.begin();
+    
+    
     //time_rtc.settime(1,1,1,1,1,1);
     //db[kk::rtc_set_m] = time_rtc.minutes;
     //db[kk::rtc_set_h] = time_rtc.Hours;
@@ -59,6 +59,7 @@ void setup() {
         Serial.println(str);
         runString(str);
     });
+    
 }
 
 
