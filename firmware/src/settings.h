@@ -39,5 +39,7 @@ DB_KEYS(
     time_ntp,
     time_rtc_,
     wifi_setup,
-    fon_setup
+    fon_setup,
+    rtc_set_h,
+    rtc_set_m
 );

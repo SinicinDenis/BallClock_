@@ -30,15 +30,50 @@ static void update(sets::Updater& u) {
     s += db[kk::adc_max].toInt16();
     s += "]";
     u.update("adc_val"_h, s);
-
+    
     u.update("local_time"_h, NTP.timeToString());
     u.update("synced"_h, NTP.synced());
+
+    //if (kk::time_ntp) {
+    //    u.update("local_time"_h, NTP.timeToString());
+    //    u.update("synced"_h, NTP.synced());
+        //u.update("synced"_h, true);
+    //} else {
+    //    u.update("local_time"_h, time_rtc.gettime("H:i:s"));
+    //}
     
-    Serial.println("------------------->");
+    
+    Serial.println(time_rtc.gettime("H:i:s"));
+    //Serial.println(NTP.timeToString());
+    //Serial.println(WiFi.localIP());
+
+    // Установка времени вручную ЧАС
+    
+    
+    if (db[kk::rtc_set_h] != 0 && db[kk::rtc_set_m] == 0) {
+        Serial.println("Час");
+        time_rtc.settime(time_rtc.seconds,time_rtc.minutes,db[kk::rtc_set_h].toInt(),25,1,2025,1);
+        db[kk::rtc_set_h] = 0;
+    }
+    // Установка времени вручную МИН
+    if (db[kk::rtc_set_m] != 0 && db[kk::rtc_set_h] == 0) {
+        Serial.println("Мин");
+        time_rtc.settime(time_rtc.seconds,db[kk::rtc_set_m].toInt(),time_rtc.Hours,25,1,2025,1);
+        db[kk::rtc_set_m] = 0;
+    }
+    //Оба параметра и час и мин при включении
+    if (db[kk::rtc_set_m] != 0 && db[kk::rtc_set_h] != 0) {
+        Serial.println("Час Мин");
+        time_rtc.settime(time_rtc.seconds,db[kk::rtc_set_m].toInt(),db[kk::rtc_set_h].toInt(),25,1,2025,1);
+        db[kk::rtc_set_m] = 0;
+        db[kk::rtc_set_h] = 0;
+    }
+    db.update();
     if (ota.hasUpdate()) u.update("ota_update"_h, F("Доступно обновление. Обновить прошивку?"));
 
     Looper.getTimer("redraw")->restart(100);
 }
+
 
 static void build(sets::Builder& b) {
     {
@@ -98,25 +133,20 @@ static void build(sets::Builder& b) {
         //b.Label("adc_val"_h, "Сигнал с датчика");
 
         if (db[kk::time_ntp]) {
-            
+            Serial.println("Час");
             b.Input(kk::ntp_gmt, "Часовой пояс");
             b.Input(kk::ntp_host, "NTP сервер");
             b.LED("synced"_h, "Синхронизирован", NTP.synced());
             b.Label("local_time"_h, "Локальное время", NTP.timeToString());
         } else {
-            b.Label("time_rtc_"_h, "Внутреннее время", time_rtc.gettime("H:i:s"));
+            
+            b.Label("Внутреннее время", time_rtc.gettime("H:i:s"));
             Serial.println(time_rtc.gettime("H:i:s"));
-            b.Input(time_rtc.settime(1,1,1,1,1,1,1), "Ввод");
+            b.Input(kk::rtc_set_h, "Установить Час");
+            b.Input(kk::rtc_set_m, "Установить Минуты");
+            
         }
     }
-    //{
-    //    sets::Group g(b, "Время");
-
-    //    b.Input(kk::ntp_gmt, "Часовой пояс");
-    //    b.Input(kk::ntp_host, "NTP сервер");
-    //    b.LED("synced"_h, "Синхронизирован", NTP.synced());
-    //    b.Label("local_time"_h, "Локальное время", NTP.timeToString());
-    //}
     {
         sets::Group g(b, "WiFi");
         if (b.Switch(kk::wifi_setup, "WiFi ⚙️")) b.reload();
@@ -163,10 +193,13 @@ LP_TICKER([]() {
         LittleFS.begin(true);
         db.begin();
 
+
+        db.init(kk::rtc_set_h, time_rtc.Hours);//Переменная для установки времени Час
+        db.init(kk::rtc_set_m, time_rtc.minutes);//Переменная для установки времени Минуты
         db.init(kk::fon_setup, false);//переменная фон для меню
         db.init(kk::time_ntp, false);//Переменная для меню времени
         db.init(kk::wifi_setup, false);//Переменная меню вайфай
-        db.init(kk::time_rtc_, time_rtc.gettime("H:i:s"));//переменная время rtc
+        db.init(kk::time_rtc_, false);//переменная время rtc
 
 
         db.init(kk::wifi_ssid, "");

@@ -5,7 +5,6 @@
 #include <WiFiConnector.h>
 #include <Wire.h>
 #include <iarduino_RTC.h>
- 
 
 iarduino_RTC time_rtc(RTC_DS1302, 25, 27, 26);
 #include "config.h"
@@ -39,7 +38,8 @@ void setup() {
     
     time_rtc.begin();
     //time_rtc.settime(1,1,1,1,1,1);
-    
+    //db[kk::rtc_set_m] = time_rtc.minutes;
+    //db[kk::rtc_set_h] = time_rtc.Hours;
     
     WiFiConnector.setName(PROJECT_NAME);
 
