@@ -66,6 +66,7 @@ void setup() {
 
 void loop() {
     
+    Serial.println("Основной loop");
     Looper.loop();
     
 }

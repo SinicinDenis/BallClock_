@@ -105,6 +105,7 @@ static void build(sets::Builder& b) {
     }
     {
         sets::Group g(b, "Яркость");
+        if (db[kk::auto_bright] == false) {b.Slider(kk::bright, "Яркость", 0, 255);}
         if (b.Switch(kk::auto_bright, "Автояркость")) b.reload();
 
         if (db[kk::auto_bright]) {
@@ -117,8 +118,7 @@ static void build(sets::Builder& b) {
                 if (b.Button(kk::adc_min, "Запомнить мин.")) db[kk::adc_min] = photo.getRaw();
                 if (b.Button(kk::adc_max, "Запомнить макс.")) db[kk::adc_max] = photo.getRaw();
             }
-        } else {
-            b.Slider(kk::bright, "Яркость", 0, 255);
+         
         }
     }
     {
