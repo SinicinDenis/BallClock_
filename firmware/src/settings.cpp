@@ -45,19 +45,21 @@ static void update(sets::Updater& u) {
     
     Serial.println(time_rtc.gettime("H:i:s"));
     //Serial.println(NTP.timeToString());
-    //Serial.println(WiFi.localIP());
+    Serial.println(WiFi.localIP());
 
     // Установка времени вручную ЧАС
     
     
     if (db[kk::rtc_set_h] != 0 && db[kk::rtc_set_m] == 0) {
-        Serial.println("Час");
+        Serial.print("Час ");
+        Serial.println(db[kk::rtc_set_h]);
         time_rtc.settime(time_rtc.seconds,time_rtc.minutes,db[kk::rtc_set_h].toInt(),25,1,2025,1);
         db[kk::rtc_set_h] = 0;
     }
     // Установка времени вручную МИН
     if (db[kk::rtc_set_m] != 0 && db[kk::rtc_set_h] == 0) {
-        Serial.println("Мин");
+        Serial.print("Мин ");
+        Serial.println(db[kk::rtc_set_m]);
         time_rtc.settime(time_rtc.seconds,db[kk::rtc_set_m].toInt(),time_rtc.Hours,25,1,2025,1);
         db[kk::rtc_set_m] = 0;
     }
@@ -78,9 +80,11 @@ static void update(sets::Updater& u) {
 static void build(sets::Builder& b) {
     {
         sets::Group g(b, "Часы");
-
-        b.Select(kk::clock_style, "Шрифт", "Нет;Тип 1;Тип 2;Тип 3");
+        if (b.Switch(kk::cl_setup, "Часы ⚙️")) b.reload();
+        if (db[kk::cl_setup]) {
+            b.Select(kk::clock_style, "Шрифт", "Нет;Тип 1;Тип 2;Тип 3");
         b.Color(kk::clock_color, "Цвет");
+        }
     }
     {
         sets::Group g(b, "Фон");
@@ -200,7 +204,7 @@ LP_TICKER([]() {
         db.init(kk::time_ntp, false);//Переменная для меню времени
         db.init(kk::wifi_setup, false);//Переменная меню вайфай
         db.init(kk::time_rtc_, false);//переменная время rtc
-
+        db.init(kk::cl_setup, false);//переменная меню время
 
         db.init(kk::wifi_ssid, "");
         db.init(kk::wifi_pass, "");
