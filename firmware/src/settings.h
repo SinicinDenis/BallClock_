@@ -42,5 +42,6 @@ DB_KEYS(
     fon_setup,
     rtc_set_h,
     rtc_set_m,
-    cl_setup
+    cl_setup,
+    cl_menu
 );

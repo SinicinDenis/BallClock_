@@ -1,12 +1,15 @@
 #include <Arduino.h>
-#include <GyverNTP.h>
+
 #include <Looper.h>
 #include <RunningGFX.h>
 #include <WiFiConnector.h>
 #include <Wire.h>
+TwoWire WIRE1 (0);
 #include <iarduino_RTC.h>
 #include <iarduino_I2C_Software.h>	
-iarduino_RTC time_rtc(RTC_DS1302, 19, 22, 21);
+
+iarduino_RTC time_rtc(RTC_DS3231);
+#include <GyverNTP.h>
 #include "config.h"
 #include "matrix.h"
 #include "settings.h"
@@ -34,12 +37,7 @@ void setup() {
     Serial.println("\n" PROJECT_NAME " v" PROJECT_VER);
 
     matrix.begin();
-    time_rtc.begin();
-    
-    
-    //time_rtc.settime(1,1,1,1,1,1);
-    //db[kk::rtc_set_m] = time_rtc.minutes;
-    //db[kk::rtc_set_h] = time_rtc.Hours;
+    time_rtc.begin(&WIRE1);
     
     WiFiConnector.setName(PROJECT_NAME);
 
@@ -66,7 +64,7 @@ void setup() {
 
 void loop() {
     
-    Serial.println("Основной loop");
+    //Serial.println("Основной loop");
     Looper.loop();
     
 }

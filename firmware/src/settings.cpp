@@ -133,22 +133,28 @@ static void build(sets::Builder& b) {
     }
     {
         sets::Group g(b, "Время");
-        if (b.Switch(kk::time_ntp, "Время из интернета")) b.reload();
-        //b.Label("adc_val"_h, "Сигнал с датчика");
+        if (b.Switch(kk::cl_menu, "Время ⚙️")) b.reload();
+        if (db[kk::cl_menu]) {
+            
+            if (b.Switch(kk::time_ntp, "Время из интернета")) b.reload();
+            //b.Label("adc_val"_h, "Сигнал с датчика");
 
-        if (db[kk::time_ntp]) {
-            Serial.println("Час");
-            b.Input(kk::ntp_gmt, "Часовой пояс");
-            b.Input(kk::ntp_host, "NTP сервер");
-            b.LED("synced"_h, "Синхронизирован", NTP.synced());
-            b.Label("local_time"_h, "Локальное время", NTP.timeToString());
-        } else {
-            
-            b.Label("Внутреннее время", time_rtc.gettime("H:i:s"));
-            Serial.println(time_rtc.gettime("H:i:s"));
-            b.Input(kk::rtc_set_h, "Установить Час");
-            b.Input(kk::rtc_set_m, "Установить Минуты");
-            
+            if (db[kk::time_ntp]) {
+
+                Serial.println("Час");
+                b.Input(kk::ntp_gmt, "Часовой пояс");
+                b.Input(kk::ntp_host, "NTP сервер");
+                b.LED("synced"_h, "Синхронизирован", NTP.synced());
+                b.Label("local_time"_h, "Локальное время", NTP.timeToString());
+
+            } else {
+                
+                b.Label("Внутреннее время", time_rtc.gettime("H:i:s"));
+                Serial.println(time_rtc.gettime("H:i:s"));
+                b.Input(kk::rtc_set_h, "Установить Час");
+                b.Input(kk::rtc_set_m, "Установить Минуты");
+                
+            }
         }
     }
     {
@@ -205,6 +211,7 @@ LP_TICKER([]() {
         db.init(kk::wifi_setup, false);//Переменная меню вайфай
         db.init(kk::time_rtc_, false);//переменная время rtc
         db.init(kk::cl_setup, false);//переменная меню время
+        db.init(kk::cl_menu, false);//переменная меню выезжающее время
 
         db.init(kk::wifi_ssid, "");
         db.init(kk::wifi_pass, "");

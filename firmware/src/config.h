@@ -1,6 +1,6 @@
 #pragma once
 
-#define PROJECT_VER "1.13"
+#define PROJECT_VER "1.14"
 #define PROJECT_NAME "Часы Пинг-Понг"
 #define PROJECT_URL "AlexGyver/BallClock/main/project.json"
 

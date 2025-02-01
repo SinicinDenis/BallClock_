@@ -89,11 +89,53 @@ static void drawClock() {
     matrix.setModeDiag();
 
     if (!NTP.synced()) {
-        matrix.setFont(gfx_font_3x5);
-        matrix.setCursor(1, 1);
-        matrix.print("--");
-        matrix.setCursor(12, 1);
-        matrix.print("--");
+        switch (db[kk::clock_style].toInt()) {
+        case 1:
+            matrix.setFont(gfx_font_3x5);
+
+            matrix.setCursor(1, 1);
+            if (time_rtc.Hours < 10) matrix.print(' ');
+            matrix.print(time_rtc.Hours);
+
+            matrix.setCursor(11, 1);
+            if (time_rtc.minutes < 10) matrix.print(0);
+            matrix.print(time_rtc.minutes);
+
+            dots(9, 9);
+            break;
+
+        case 2:
+            matrix.setFont(font_3x5_diag);
+
+            matrix.setCursor(1, 1);
+            if (time_rtc.Hours < 10) matrix.print(' ');
+            matrix.print(time_rtc.Hours);
+
+            matrix.setCursor(11, 1);
+            if (time_rtc.minutes < 10) matrix.print(0);
+            matrix.print(time_rtc.minutes);
+
+            dots(9, 9);
+            break;
+
+        case 3:
+            matrix.setFont(font_4x5);
+
+            if (time_rtc.Hours >= 10) {
+                matrix.setCursor(1, 1);
+                matrix.print(time_rtc.Hours / 10);
+            }
+            matrix.setCursor(5, 1);
+            matrix.print(time_rtc.Hours % 10);
+
+            matrix.setCursor(11, 1);
+            matrix.print(time_rtc.minutes / 10);
+            matrix.setCursor(15, 1);
+            matrix.print(time_rtc.minutes % 10);
+
+            dots(9, 10);
+            break;
+    }
         return;
     }
 
