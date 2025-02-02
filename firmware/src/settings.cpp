@@ -33,6 +33,9 @@ static void update(sets::Updater& u) {
     
     u.update("local_time"_h, NTP.timeToString());
     u.update("synced"_h, NTP.synced());
+    if (NTP.synced()) {
+        time_rtc.settime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year(), NTP.weekDay());
+    }
 
     //if (kk::time_ntp) {
     //    u.update("local_time"_h, NTP.timeToString());
@@ -135,7 +138,7 @@ static void build(sets::Builder& b) {
         sets::Group g(b, "Время");
         if (b.Switch(kk::cl_menu, "Время ⚙️")) b.reload();
         if (db[kk::cl_menu]) {
-            
+
             if (b.Switch(kk::time_ntp, "Время из интернета")) b.reload();
             //b.Label("adc_val"_h, "Сигнал с датчика");
 
