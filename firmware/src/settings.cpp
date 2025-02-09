@@ -34,7 +34,10 @@ static void update(sets::Updater& u) {
     u.update("local_time"_h, NTP.timeToString());
     u.update("synced"_h, NTP.synced());
     if (NTP.synced()) {
-        time_rtc.settime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year(), NTP.weekDay());
+        if (millis() % 10000 > 9000) {
+            time_rtc.settime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year(), NTP.weekDay());
+        } 
+        
     }
 
     //if (kk::time_ntp) {
@@ -163,19 +166,14 @@ static void build(sets::Builder& b) {
     {
         sets::Group g(b, "WiFi");
         if (b.Switch(kk::wifi_setup, "WiFi ⚙️")) b.reload();
-
         if (db[kk::wifi_setup]) {
-
             b.Switch(kk::show_ip, "Показывать IP");
             b.Input(kk::wifi_ssid, "Название сети Wifi");
             b.Pass(kk::wifi_pass, "Пароль от Wifi", "");
-
             if (b.Button("wifi_save"_h, "Подключить")) {
                 Looper.pushEvent("wifi_connect");
             }
         }
-
-        
     }
 
     if (b.Confirm("ota_update"_h)) {

@@ -1,4 +1,4 @@
-#include "palettes.h"
+ #include "palettes.h"
 
 #include <FastLED.h>
 

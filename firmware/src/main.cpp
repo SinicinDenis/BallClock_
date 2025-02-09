@@ -47,7 +47,7 @@ void setup() {
         Serial.print("Connected: ");
         Serial.println(WiFi.localIP());
         if (db[kk::show_ip]) runString(WiFi.localIP().toString());
-        
+        time_rtc.settime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year(), NTP.weekDay());
         ota.checkUpdate();
     });
 

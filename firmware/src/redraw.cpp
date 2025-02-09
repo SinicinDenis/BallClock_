@@ -13,6 +13,8 @@
 #include "palettes.h"
 #include "settings.h"
 
+//extern iarduino_RTC time_rtc;
+
 ADCFilt photo(PHOTO_PIN, 14);
 
 struct GradData {
@@ -57,7 +59,20 @@ static void dots(int x1, int x2) {
     uint32_t color = matrix.getColor24();
     uint32_t color1 = matrix.getLED(x1, 2);
     uint32_t color2 = matrix.getLED(x2, 4);
-    uint16_t ms = NTP.ms();
+    uint16_t ms = NTP.ms();// = millis() % 1000;
+
+    switch(NTP.synced()) {
+        case 0:
+            ms = millis() % 1000;
+            Serial.println("Case 0");
+            break;
+        case 1:
+            ms = NTP.ms();
+            Serial.println("Case 1");
+            break;
+    }
+
+    Serial.println(NTP.synced());
 
     switch (ms) {
         case 0 ... DOT_FADE_PRD - 1:
@@ -89,53 +104,54 @@ static void drawClock() {
     matrix.setModeDiag();
 
     if (!NTP.synced()) {
+        Serial.println(time_rtc.gettime("H:i:s"));
         switch (db[kk::clock_style].toInt()) {
-        case 1:
-            matrix.setFont(gfx_font_3x5);
+            case 1:
+                matrix.setFont(gfx_font_3x5);
 
-            matrix.setCursor(1, 1);
-            if (time_rtc.Hours < 10) matrix.print(' ');
-            matrix.print(time_rtc.Hours);
-
-            matrix.setCursor(11, 1);
-            if (time_rtc.minutes < 10) matrix.print(0);
-            matrix.print(time_rtc.minutes);
-
-            dots(9, 9);
-            break;
-
-        case 2:
-            matrix.setFont(font_3x5_diag);
-
-            matrix.setCursor(1, 1);
-            if (time_rtc.Hours < 10) matrix.print(' ');
-            matrix.print(time_rtc.Hours);
-
-            matrix.setCursor(11, 1);
-            if (time_rtc.minutes < 10) matrix.print(0);
-            matrix.print(time_rtc.minutes);
-
-            dots(9, 9);
-            break;
-
-        case 3:
-            matrix.setFont(font_4x5);
-
-            if (time_rtc.Hours >= 10) {
                 matrix.setCursor(1, 1);
-                matrix.print(time_rtc.Hours / 10);
-            }
-            matrix.setCursor(5, 1);
-            matrix.print(time_rtc.Hours % 10);
+                if (time_rtc.Hours < 10) matrix.print(' ');
+                matrix.print(time_rtc.Hours);
 
-            matrix.setCursor(11, 1);
-            matrix.print(time_rtc.minutes / 10);
-            matrix.setCursor(15, 1);
-            matrix.print(time_rtc.minutes % 10);
+                matrix.setCursor(11, 1);
+                if (time_rtc.minutes < 10) matrix.print(0);
+                matrix.print(time_rtc.minutes);
 
-            dots(9, 10);
-            break;
-    }
+                dots(9, 9);
+                break;
+
+            case 2:
+                matrix.setFont(font_3x5_diag);
+
+                matrix.setCursor(1, 1);
+                if (time_rtc.Hours < 10) matrix.print(' ');
+                matrix.print(time_rtc.Hours);
+
+                matrix.setCursor(11, 1);
+                if (time_rtc.minutes < 10) matrix.print(0);
+                matrix.print(time_rtc.minutes);
+
+                dots(9, 9);
+                break;
+
+            case 3:
+                matrix.setFont(font_4x5);
+
+                if (time_rtc.Hours >= 10) {
+                    matrix.setCursor(1, 1);
+                    matrix.print(time_rtc.Hours / 10);
+                }
+                matrix.setCursor(5, 1);
+                matrix.print(time_rtc.Hours % 10);
+
+                matrix.setCursor(11, 1);
+                matrix.print(time_rtc.minutes / 10);
+                matrix.setCursor(15, 1);
+                matrix.print(time_rtc.minutes % 10);
+
+                dots(9, 10);
+                break;
+        }
         return;
     }
 
@@ -221,6 +237,7 @@ static void drawBack() {
                     matrix.setLED(x, y, *((uint32_t*)color));
                 });
             });
+        //break;
         } break;
 
         // perlin
@@ -231,6 +248,7 @@ static void drawBack() {
                     uint32_t col = getPaletteColor(pal, inoise16(x * scale * 64, y * scale * 64, count * 32), bright);
                     matrix.setLED(x, y, col);
                 }
+            //break;
             }
             break;
     }
